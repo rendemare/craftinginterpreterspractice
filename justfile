@@ -1,6 +1,4 @@
-alias b := build
-
 host := 'uname -a'
 
-build:
+run:
     javac lox/*.java
