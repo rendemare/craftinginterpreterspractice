@@ -1,1 +1,2 @@
-*Crafting interpreters https://craftinginterpreters.com practice repo
+#Practice repo
+Practice repository for code while reading https://craftinginterpreters.com by Robert Nystrom
