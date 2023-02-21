@@ -3,5 +3,6 @@
 *.log
 *.class
 tmp/
+justfile
 
 
