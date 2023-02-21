@@ -33,6 +33,7 @@ class Scanner {
   private void scanToken() {
     char c = advance();
     switch (c) {
+      case '"': string(); break;
       case '(': addToken(LEFT_PAREN); break;
       case ')': addToken(RIGHT_PAREN); break;
       case '{': addToken(LEFT_BRACE); break;
@@ -73,9 +74,43 @@ class Scanner {
         }
         break;
       default:
-        Lox.error(line, "Error: unexpected character");
+        if (isDigit(c)) {
+          number();
+        } else {
+          Lox.error(line, "Unexpected character.");
+        }
+        //Lox.error(line, "Error: unexpected character");
         break;
     }
+  }
+
+  private void number() {
+    while (isDigit(peek())) advance();
+    if (peek() == '.' && isDigit(peekNext())) {
+      advance();
+      while (isDigit(peek())) advance();
+    }
+    addToken(NUMBER,
+        Double.parseDouble(source.substring(start, current)));
+  }
+
+  private void string() {
+    while (peek() != '"' && !isAtEnd()) {
+      if (peek() == '\n') line++;
+      advance();
+    }
+
+    if (isAtEnd()) {
+      Lox.error(line, "Unterminated string.");
+      return;
+    }
+
+    // The closing ".
+    advance();
+
+    // Trim the surrounding quotes.
+    String value = source.substring(start + 1, current - 1);
+    addToken(STRING, value);
   }
 
   private boolean match(char expected) {
@@ -89,6 +124,11 @@ class Scanner {
   private char peek() {
     if (isAtEnd()) return '\0';
     return source.charAt(current);
+  }
+
+  private char peekNext() {
+    if (current + 1 >= source.length()) return '\0';
+    return source.charAt(current + 1);
   }
 
   private boolean isAtEnd() {
@@ -106,5 +146,9 @@ class Scanner {
   private void addToken(TokenType type, Object literal) {
     String text = source.substring(start, current);
     tokens.add(new Token(type, text, literal, line));
+  }
+
+  private boolean isDigit(char c) {
+    return c >= '0' && c <= '9';
   }
 }
