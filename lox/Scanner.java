@@ -18,6 +18,7 @@ class Scanner {
   Scanner(String source) {
     this.source = source;
   }
+
   List<Token> scanTokens() {
     while (!isAtEnd()) {
       // We are at the beginning of the next lexeme.
@@ -28,6 +29,7 @@ class Scanner {
     tokens.add(new Token(EOF, "", null, line));
     return tokens;
   }
+
   private void scanToken() {
     char c = advance();
     switch (c) {
@@ -41,7 +43,30 @@ class Scanner {
       case '+': addToken(PLUS); break;
       case ';': addToken(SEMICOLON); break;
       case '*': addToken(STAR); break;
+      case '!':
+        addToken(match('=') ? BANG_EQUAL : BANG);
+        break;
+      case '=':
+        addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+        break;
+      case '<':
+        addToken(match('=') ? LESS_EQUAL : LESS);
+        break;
+      case '>':
+        addToken(match('=') ? GREATER_EQUAL : GREATER);
+        break;
+      default:
+        Lox.error(line, "Error: unexpected character");
+        break;
     }
+  }
+
+  private boolean match(char expected) {
+    if (isAtEnd()) return false;
+    if (source.charAt(current) != expected) return false;
+
+    current++;
+    return true;
   }
 
   private boolean isAtEnd() {
