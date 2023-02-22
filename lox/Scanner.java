@@ -69,9 +69,10 @@ class Scanner {
         if (match('/')) {
           // A comment goes until the end of the line.
           while (peek() != '\n' && !isAtEnd()) advance();
-        } else {
+        } else if(match('*'))
+          multicomment();
+        else
           addToken(SLASH);
-        }
         break;
       default:
         if (isDigit(c)) {
@@ -84,6 +85,16 @@ class Scanner {
         //Lox.error(line, "Error: unexpected character");
         break;
     }
+  }
+
+  private void multicomment() {
+    while(peek() != '*' && peekNext() != '/' && !isAtEnd()) {
+      if(peek() == '\n') line++;
+      advance();
+    }
+    if(isAtEnd()) return;
+    advance();
+    if(!isAtEnd()) advance();
   }
 
   private void identifier() {
